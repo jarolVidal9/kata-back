@@ -1,15 +1,13 @@
 import { Router } from 'express';
+import { AuthController } from './auth.controller';
 
 const router = Router();
+const authController = new AuthController();
 
 // POST /api/auth/register - Registro
-router.post('/register', (_req, res) => {
-  res.json({ message: 'Registro de usuario' });
-});
+router.post('/register', authController.register);
 
 // POST /api/auth/login - Login
-router.post('/login', (_req, res) => {
-  res.json({ message: 'Login de usuario' });
-});
+router.post('/login', authController.login);
 
 export default router;
