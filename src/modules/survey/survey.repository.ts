@@ -5,11 +5,16 @@ export class SurveyRepository {
   private repository = AppDataSource.getRepository(Survey);
 
   async findAll(userId: number) {
-    return this.repository.find({
-      where: { createdBy: userId },
-      relations: ['questions'],
-      order: { createdAt: 'DESC' }
-    });
+    const surveys = await this.repository
+      .createQueryBuilder('survey')
+      .leftJoinAndSelect('survey.creator', 'creator')
+      .loadRelationCountAndMap('survey.questionsCount', 'survey.questions')
+      .loadRelationCountAndMap('survey.responsesCount', 'survey.responses')
+      .where('survey.createdBy = :userId', { userId })
+      .orderBy('survey.createdAt', 'DESC')
+      .getMany();
+
+    return surveys;
   }
 
   async findById(id: number) {

@@ -5,19 +5,17 @@ import { authMiddleware } from '../../shared/middlewares/authMiddleware';
 const router = Router();
 const controller = new SurveyController();
 
-// Rutas públicas
+// Ruta pública para ver y responder encuestas
 router.get('/public/:id', controller.getPublicSurvey);
 
 // Rutas protegidas (requieren autenticación)
 router.use(authMiddleware);
 
-router.get('/', controller.getMySurveys);
-router.get('/:id', controller.getSurveyById);
-router.post('/', controller.createSurvey);
-router.put('/:id', controller.updateSurvey);
-router.delete('/:id', controller.deleteSurvey);
-router.patch('/:id/publish', controller.publishSurvey);
-router.patch('/:id/close', controller.closeSurvey);
-router.get('/:id/stats', controller.getSurveyStats);
+// CRUD básico de encuestas
+router.get('/', controller.getMySurveys);           // Listar mis encuestas
+router.get('/:id', controller.getSurveyById);       // Obtener una encuesta
+router.post('/', controller.createSurvey);          // Crear encuesta
+router.put('/:id', controller.updateSurvey);        // Actualizar encuesta (incluye cambio de estado)
+router.delete('/:id', controller.deleteSurvey);     // Eliminar encuesta
 
 export default router;

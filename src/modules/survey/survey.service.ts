@@ -106,6 +106,14 @@ export class SurveyService {
       throw new NotFoundError('Encuesta no encontrada');
     }
 
+    // Validar si se intenta publicar sin preguntas
+    if (data.status === SurveyStatus.PUBLISHED) {
+      const questionCount = data.questions ? data.questions.length : survey.questions.length;
+      if (questionCount === 0) {
+        throw new BadRequestError('No se puede publicar una encuesta sin preguntas');
+      }
+    }
+
     // Actualizar survey
     const updateData: any = {};
     if (data.title) updateData.title = data.title;
@@ -147,48 +155,5 @@ export class SurveyService {
     }
 
     await this.surveyRepo.delete(id);
-  }
-
-  async publishSurvey(id: number, userId: number) {
-    const survey = await this.surveyRepo.findByIdAndUser(id, userId);
-    
-    if (!survey) {
-      throw new NotFoundError('Encuesta no encontrada');
-    }
-
-    if (survey.questions.length === 0) {
-      throw new BadRequestError('No se puede publicar una encuesta sin preguntas');
-    }
-
-    return this.surveyRepo.update(id, { status: SurveyStatus.PUBLISHED });
-  }
-
-  async closeSurvey(id: number, userId: number) {
-    const survey = await this.surveyRepo.findByIdAndUser(id, userId);
-    
-    if (!survey) {
-      throw new NotFoundError('Encuesta no encontrada');
-    }
-
-    return this.surveyRepo.update(id, { status: SurveyStatus.CLOSED });
-  }
-
-  async getSurveyStats(id: number, userId: number) {
-    const survey = await this.surveyRepo.findByIdAndUser(id, userId);
-    
-    if (!survey) {
-      throw new NotFoundError('Encuesta no encontrada');
-    }
-
-    const responseCount = await this.surveyRepo.countResponsesBySurvey(id);
-
-    return {
-      survey,
-      stats: {
-        totalResponses: responseCount,
-        questionCount: survey.questions.length,
-        status: survey.status
-      }
-    };
   }
 }
