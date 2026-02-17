@@ -1,4 +1,4 @@
-import express, { Application, Request, Response } from 'express';
+import express, { Application} from 'express';
 import cors from 'cors';
 import { errorHandler } from './shared/middlewares/errorHandler';
 
@@ -15,18 +15,14 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Routes
-app.get('/', (_req: Request, res: Response) => {
-  res.json({ 
-    message: 'API Kata Encuestas - Backend',
-    version: '1.0.0',
-    endpoints: {
-      auth: '/api/auth',
-      surveys: '/api/surveys',
-      questions: '/api/questions',
-      responses: '/api/responses'
-    }
+// Middleware para logging de peticiones
+app.use((req, res, next) => {
+  const start = Date.now();
+  res.on('finish', () => {
+    const duration = Date.now() - start;
+    console.log(` ${req.method} ${req.originalUrl} - ${res.statusCode} (${duration}ms)`);
   });
+  next();
 });
 
 // API Routes
