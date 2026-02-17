@@ -1,30 +1,23 @@
 import { Router } from 'express';
+import { SurveyController } from './survey.controller';
+import { authMiddleware } from '../../shared/middlewares/authMiddleware';
 
 const router = Router();
+const controller = new SurveyController();
 
-// GET /api/surveys - Obtener todas las encuestas
-router.get('/', (_req, res) => {
-  res.json({ message: 'Listar encuestas' });
-});
+// Rutas públicas
+router.get('/public/:id', controller.getPublicSurvey);
 
-// GET /api/surveys/:id - Obtener una encuesta
-router.get('/:id', (req, res) => {
-  res.json({ message: `Obtener encuesta ${req.params.id}` });
-});
+// Rutas protegidas (requieren autenticación)
+router.use(authMiddleware);
 
-// POST /api/surveys - Crear encuesta
-router.post('/', (_req, res) => {
-  res.json({ message: 'Crear encuesta' });
-});
-
-// PUT /api/surveys/:id - Actualizar encuesta
-router.put('/:id', (req, res) => {
-  res.json({ message: `Actualizar encuesta ${req.params.id}` });
-});
-
-// DELETE /api/surveys/:id - Eliminar encuesta
-router.delete('/:id', (req, res) => {
-  res.json({ message: `Eliminar encuesta ${req.params.id}` });
-});
+router.get('/', controller.getMySurveys);
+router.get('/:id', controller.getSurveyById);
+router.post('/', controller.createSurvey);
+router.put('/:id', controller.updateSurvey);
+router.delete('/:id', controller.deleteSurvey);
+router.patch('/:id/publish', controller.publishSurvey);
+router.patch('/:id/close', controller.closeSurvey);
+router.get('/:id/stats', controller.getSurveyStats);
 
 export default router;

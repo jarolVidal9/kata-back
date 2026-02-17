@@ -1,15 +1,19 @@
 import { Router } from 'express';
+import { ResponseController } from './response.controller';
+import { authMiddleware } from '../../shared/middlewares/authMiddleware';
 
 const router = Router();
+const controller = new ResponseController();
 
-// GET /api/responses - Obtener todas las respuestas
-router.get('/', (_req, res) => {
-  res.json({ message: 'Listar respuestas' });
-});
+// Ruta pública para enviar respuestas
+router.post('/submit', controller.submitResponse);
 
-// POST /api/responses - Enviar respuesta
-router.post('/', (_req, res) => {
-  res.json({ message: 'Crear respuesta' });
-});
+// Rutas protegidas (requieren autenticación)
+router.use(authMiddleware);
+
+router.get('/survey/:surveyId', controller.getResponsesBySurvey);
+router.get('/:id', controller.getResponseById);
+router.delete('/:id', controller.deleteResponse);
+router.get('/survey/:surveyId/analytics', controller.getSurveyAnalytics);
 
 export default router;
